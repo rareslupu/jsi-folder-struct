@@ -7,12 +7,12 @@
 <body>
 <div class="container">
 	<div class='widget'>
-      <input placeholder="filter..." type="text"/>
-    </div>
-  <ul class='folder-container'>
-  	<li class='folder-item'></li>
-  	<li class='folder-wrapper'></li>
-  </ul>
+		<input placeholder="filter..." type="text" onkeyup="filterTree(this.value)"/>
+	</div>
+	<ul id="folders" class="folder-container"></ul>
 </div>
+
+
+<script src="main.js"></script>
 </body>
 </html>
