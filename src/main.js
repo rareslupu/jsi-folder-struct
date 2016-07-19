@@ -60,25 +60,25 @@ const folders ={
 }
 
 let foldersHTML=''; //store html content for displaying json object sturcutre
-
+let newObj=[];
+let children;
 /*
- function take as param a json object and a string searchValue to filter
- json data to be displayed
+ function take as param a json object and form html content to be displayed
  */
-function eachRecursive(obj, searchValue)
+function generateHTMLContent(obj)
 {
   //if it is a directory, add folder structure
-  if(obj.type=='dir' && (obj.name.indexOf(searchValue) >-1) ){
+  if(obj.type=='dir'){
     foldersHTML+='<li class="folder-item">'+obj.name+'</li>';
   }
 
   //if it is a file, add file structure
-  if(obj.type=='file' && (obj.name.indexOf(searchValue) >-1)){
+  if(obj.type=='file'){
     foldersHTML+='<li class="file-item">'+obj.name+'</li>';
   }
 
   //if object has subfiles add subfiles wrapper
-  if(obj.hasOwnProperty("children" ) && (obj.name.indexOf(searchValue) >-1)){
+  if(obj.hasOwnProperty("children")){
     foldersHTML+='<li class="folder-wrapper">';
     foldersHTML+='<ul class="folder-container">';
   }
@@ -87,12 +87,12 @@ function eachRecursive(obj, searchValue)
   for (var key in obj)
   {
     if (typeof obj[key] == "object" && obj[key] !== null){
-      eachRecursive(obj[key],searchValue);
+      generateHTMLContent(obj[key]);
     }
   }
 
   //after processing childrens close wrapper tags
-  if(obj.hasOwnProperty("children") && (obj.name.indexOf(searchValue) >-1)){
+  if(obj.hasOwnProperty("children")){
     foldersHTML+='</ul>';
     foldersHTML+='</li>';
   }
@@ -102,14 +102,36 @@ function eachRecursive(obj, searchValue)
 /*
 function takes user input on keystroke and set data to be displayed
  */
-function filterTree(word) {
+function displayTree(word) {
 
   foldersHTML='';   //reset html content
+  newObj=[];
+  children='';
+  filterJSON(folders,word); //filter json object based on input word
 
-  eachRecursive(folders,word);   //filter json and form new html content
+  generateHTMLContent(newObj);   //form new html content
 
   document.getElementById("folders").innerHTML=foldersHTML;
 }
 
 //on page load display all data
-filterTree('');
+displayTree('');
+
+
+function filterJSON(obj, searchValue)
+{
+  if(obj.name && (obj.name.indexOf(searchValue) >-1)){
+      newObj.push(obj);
+      return
+  }
+
+  children=obj.children;
+
+    for (var key in obj)
+    {
+      if (typeof obj[key] == "object" && obj[key] !== null){
+        filterJSON(obj[key],searchValue);
+      }
+    }
+
+}
