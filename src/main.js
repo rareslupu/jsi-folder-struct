@@ -60,8 +60,46 @@ const folders ={
 }
 
 let foldersHTML=''; //store html content for displaying json object sturcutre
-let newObj=[];
-let children;
+let newObj=[]; //stores new filtered json object
+
+
+//on page load display all data
+displayTree('');
+
+/*
+ function takes user input on keystroke and set data to be displayed
+ */
+function displayTree(word) {
+
+  foldersHTML='';   //reset html content
+  newObj=[]; //reset new json object
+
+  filterJSON(folders,word); //filter json object based on input word
+
+  generateHTMLContent(newObj);   //form new html content
+
+  document.getElementById("folders").innerHTML=foldersHTML; //display new html content in page
+}
+
+
+/*
+function create a new json object that is filtred by the searchValue
+ */
+function filterJSON(obj, searchValue)
+{
+  if(obj.name && (obj.name.indexOf(searchValue) >-1)){
+      newObj.push(obj);
+      return
+  }
+    for (var key in obj)
+    {
+      if (typeof obj[key] == "object" && obj[key] !== null){
+        filterJSON(obj[key],searchValue);
+      }
+    }
+}
+
+
 /*
  function take as param a json object and form html content to be displayed
  */
@@ -96,42 +134,4 @@ function generateHTMLContent(obj)
     foldersHTML+='</ul>';
     foldersHTML+='</li>';
   }
-}
-
-
-/*
-function takes user input on keystroke and set data to be displayed
- */
-function displayTree(word) {
-
-  foldersHTML='';   //reset html content
-  newObj=[];
-  children='';
-  filterJSON(folders,word); //filter json object based on input word
-
-  generateHTMLContent(newObj);   //form new html content
-
-  document.getElementById("folders").innerHTML=foldersHTML;
-}
-
-//on page load display all data
-displayTree('');
-
-
-function filterJSON(obj, searchValue)
-{
-  if(obj.name && (obj.name.indexOf(searchValue) >-1)){
-      newObj.push(obj);
-      return
-  }
-
-  children=obj.children;
-
-    for (var key in obj)
-    {
-      if (typeof obj[key] == "object" && obj[key] !== null){
-        filterJSON(obj[key],searchValue);
-      }
-    }
-
 }
