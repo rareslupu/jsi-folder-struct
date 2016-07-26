@@ -1,5 +1,4 @@
-const folders = {
-  directories: [
+const folders = [
     {
       type: 'dir',
       name: 'app',
@@ -56,15 +55,14 @@ const folders = {
         }
       ]
     }
-  ]
-};
+  ];
 
+let index=0;
 var FolderContainer=React.createClass({
-
   renderChildren(children){
     return(
-        <li className='folder-wrapper'>
-            <FolderContainer data={children}/>
+        <li className='folder-wrapper' key={index++}>
+          <FolderContainer data={children} key={index++}/>
         </li>
     );
   },
@@ -74,10 +72,10 @@ var FolderContainer=React.createClass({
     for (var key in items)
     {
       if(items[key].type== 'dir'){
-        output.push(<FolderItem name={items[key].name} />);
+        output.push(<FolderItem name={items[key].name} key={index++}/>);
       }
       else if(items[key].type== 'file'){
-        output.push(<FileItem name={items[key].name} />);
+        output.push(<FileItem name={items[key].name} key={index++} />);
       }
       if (items[key].children){
         output.push(
@@ -86,8 +84,8 @@ var FolderContainer=React.createClass({
       }
     }
     return(
-        <ul className='folder-container'>
-        {output}
+        <ul className='folder-container' key={index++}>
+          {output}
         </ul>
     );
   }
@@ -116,7 +114,6 @@ var FileItem=React.createClass({
 var Input=React.createClass({
 
   render: function () {
-
     return(
         <div className="widget" onChange={this.props.handleInput}>
           <input placeholder="filter..." type="text"/>
@@ -127,6 +124,18 @@ var Input=React.createClass({
 
 var Container=React.createClass({
 
+  render: function () {
+    return(
+        <div className='widget'>
+          <Input handleInput={this.props.handleInputChange}/>
+          <FolderContainer data={this.props.data}/>
+        </div>
+    );
+  }
+});
+
+
+var App=React.createClass({
   transformJSON: function(data, value){
     let newObj=[];
 
@@ -146,20 +155,17 @@ var Container=React.createClass({
     return newObj;
   },
   handleInputChange: function(e) {
-    this.setState({data: this.transformJSON(this.props.data,e.target.value)});
+    this.setState({dataMap: this.state.dataMap.set('current', this.transformJSON(this.props.data,e.target.value)).set('value', e.target.value)});
   },
   getInitialState: function () {
-    return {data: this.props.data};
+    let dataMap=Immutable.Map({original: this.props.data, current: this.props.data, value: ""});
+    return{dataMap: dataMap};
   },
-
   render: function () {
+
     return(
-        <div className='widget'>
-          <Input handleInput={this.handleInputChange}/>
-          <FolderContainer data={this.state.data}/>
-        </div>
+      <Container data={this.state.dataMap.get("current")} handleInputChange={this.handleInputChange}/>
     );
   }
 });
-
-ReactDOM.render( <Container data={folders.directories}/>, document.getElementById('container'));
+ReactDOM.render( <App data={folders}/>, document.getElementById('container'));
